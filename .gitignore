@@ -1,0 +1,12 @@
+# Frontend (Ionic)
+/node_modules/
+frontend/.angular/
+frontend/www/
+frontend/.sass-cache/
+frontend/.env
+
+# Backend (Strapi)
+backend/node_modules/
+backend/.cache/
+backend/build/
+backend/.tmp/

@@ -1,0 +1,199 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goToDashboard()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestión de Eventos</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="abrirModalEvento()">
+        <ion-icon name="add-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="eventos-container">
+    <!-- Lista de eventos -->
+    <div class="eventos-list">
+      <ion-card *ngFor="let evento of eventos" class="evento-card">
+        <ion-card-header>
+          <div class="evento-header">
+            <div class="evento-info">
+              <ion-card-title>{{evento.nombre}}</ion-card-title>
+              <ion-card-subtitle>
+                <ion-icon name="calendar-outline"></ion-icon>
+                {{evento.fecha | date:'dd/MM/yyyy HH:mm'}}
+              </ion-card-subtitle>
+            </div>
+            <ion-button fill="clear" (click)="editarEvento(evento)">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="evento-details">
+            <!-- Carreras promocionadas -->
+            <div class="detail-section">
+              <h4><ion-icon name="school-outline"></ion-icon> Carreras Promocionadas</h4>
+              <div class="carreras-chips">
+                <ion-chip *ngFor="let carrera of evento.carreras_promocionadas" color="primary">
+                  <ion-label>{{carrera.nombre}}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+
+            <!-- Maestro responsable -->
+            <div class="detail-section" *ngIf="evento.maestro">
+              <h4><ion-icon name="person-outline"></ion-icon> Maestro Responsable</h4>
+              <p>{{evento.maestro}}</p>
+            </div>
+
+            <!-- Vehículos disponibles -->
+            <div class="detail-section" *ngIf="evento.vehiculos_disponibles.length > 0">
+              <h4><ion-icon name="car-outline"></ion-icon> Vehículos Disponibles</h4>
+              <div class="vehiculos-list">
+                <ion-chip *ngFor="let vehiculo of evento.vehiculos_disponibles" color="secondary">
+                  <ion-label>{{vehiculo}}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+
+            <!-- Participantes -->
+            <div class="detail-section" *ngIf="evento.participantes.length > 0">
+              <h4><ion-icon name="people-outline"></ion-icon> Participantes</h4>
+              <div class="participantes-list">
+                <ion-chip *ngFor="let participante of evento.participantes" color="tertiary">
+                  <ion-label>{{participante}}</ion-label>
+                </ion-chip>
+              </div>
+            </div>
+
+            <!-- Observaciones -->
+            <div class="detail-section" *ngIf="evento.observaciones">
+              <h4><ion-icon name="document-text-outline"></ion-icon> Observaciones</h4>
+              <p class="observaciones">{{evento.observaciones}}</p>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Mensaje cuando no hay eventos -->
+    <div class="no-events" *ngIf="eventos.length === 0">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <h3>No hay eventos registrados</h3>
+      <p>Crea tu primer evento haciendo clic en el botón "+"</p>
+    </div>
+  </div>
+
+  <!-- Modal para crear/editar evento -->
+  <ion-modal [isOpen]="showEventoModal" (didDismiss)="cerrarModalEvento()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>{{isEditing ? 'Editar' : 'Crear'}} Evento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalEvento()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <form [formGroup]="eventoForm" (ngSubmit)="guardarEvento()">
+          <div class="modal-content">
+            <ion-item>
+              <ion-label position="stacked">Nombre del Evento *</ion-label>
+              <ion-input 
+                formControlName="nombre" 
+                placeholder="Ej: Feria Educativa Zacatecas 2024"
+                [class.error]="isFieldInvalid('nombre')">
+              </ion-input>
+            </ion-item>
+            <div class="error-message" *ngIf="isFieldInvalid('nombre')">
+              El nombre del evento es requerido
+            </div>
+
+            <ion-item>
+              <ion-label position="stacked">Fecha y Hora *</ion-label>
+              <ion-datetime 
+                formControlName="fecha"
+                display-format="DD/MM/YYYY HH:mm"
+                picker-format="DD/MM/YYYY HH:mm"
+                [class.error]="isFieldInvalid('fecha')">
+              </ion-datetime>
+            </ion-item>
+            <div class="error-message" *ngIf="isFieldInvalid('fecha')">
+              La fecha es requerida
+            </div>
+
+            <ion-item>
+              <ion-label position="stacked">Carreras a Promocionar *</ion-label>
+              <ion-select 
+                formControlName="carreras_promocionadas" 
+                multiple="true"
+                placeholder="Selecciona las carreras"
+                [class.error]="isFieldInvalid('carreras_promocionadas')">
+                <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.id">
+                  {{carrera.nombre}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+            <div class="error-message" *ngIf="isFieldInvalid('carreras_promocionadas')">
+              Selecciona al menos una carrera
+            </div>
+
+            <ion-item>
+              <ion-label position="stacked">Maestro Responsable</ion-label>
+              <ion-input 
+                formControlName="maestro" 
+                placeholder="Nombre del maestro responsable">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Vehículos Disponibles</ion-label>
+              <ion-input 
+                formControlName="vehiculos_disponibles" 
+                placeholder="Separar por comas: Camioneta 1, Autobús, etc.">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Participantes</ion-label>
+              <ion-input 
+                formControlName="participantes" 
+                placeholder="Separar por comas: Juan Pérez, María López, etc.">
+              </ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Observaciones</ion-label>
+              <ion-textarea 
+                formControlName="observaciones" 
+                placeholder="Notas adicionales sobre el evento..."
+                rows="3">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button 
+              expand="block" 
+              type="submit" 
+              [disabled]="eventoForm.invalid"
+              class="submit-button">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              {{isEditing ? 'Actualizar' : 'Crear'}} Evento
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

@@ -1,0 +1,234 @@
+<ion-content class="registro-publico">
+  <div class="header-section">
+    <div class="utzac-branding">
+      <ion-icon name="school-outline" class="logo-icon"></ion-icon>
+      <div class="branding-text">
+        <h1>UTZAC</h1>
+        <p>Universidad Tecnológica Zacatecas Norte</p>
+      </div>
+    </div>
+    <div class="page-title">
+      <h2>Registro de Aspirantes</h2>
+      <p>Completa el formulario para iniciar tu proceso de admisión</p>
+    </div>
+  </div>
+
+  <form [formGroup]="aspiranteForm" (ngSubmit)="onSubmit()" class="aspirante-form">
+    <div class="form-section">
+      <h3>Información Personal</h3>
+      
+      <ion-item>
+        <ion-label position="stacked">Nombre *</ion-label>
+        <ion-input 
+          formControlName="nombre" 
+          placeholder="Ingresa tu nombre"
+          [class.error]="isFieldInvalid('nombre')">
+        </ion-input>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('nombre')">
+        El nombre es requerido
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Apellidos *</ion-label>
+        <ion-input 
+          formControlName="apellidos" 
+          placeholder="Ingresa tus apellidos"
+          [class.error]="isFieldInvalid('apellidos')">
+        </ion-input>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('apellidos')">
+        Los apellidos son requeridos
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Correo Electrónico *</ion-label>
+        <ion-input 
+          type="email"
+          formControlName="email" 
+          placeholder="ejemplo@correo.com"
+          [class.error]="isFieldInvalid('email')">
+        </ion-input>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('email')">
+        <span *ngIf="aspiranteForm.get('email')?.errors?.['required']">El correo es requerido</span>
+        <span *ngIf="aspiranteForm.get('email')?.errors?.['email']">Ingresa un correo válido</span>
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Teléfono *</ion-label>
+        <ion-input 
+          type="tel"
+          formControlName="telefono" 
+          placeholder="10 dígitos"
+          [class.error]="isFieldInvalid('telefono')">
+        </ion-input>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('telefono')">
+        El teléfono es requerido
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Grado Escolar Actual *</ion-label>
+        <ion-select 
+          formControlName="grado_escolar" 
+          placeholder="Selecciona tu grado"
+          [class.error]="isFieldInvalid('grado_escolar')">
+          <ion-select-option value="1° Semestre">1° Semestre</ion-select-option>
+          <ion-select-option value="2° Semestre">2° Semestre</ion-select-option>
+          <ion-select-option value="3° Semestre">3° Semestre</ion-select-option>
+          <ion-select-option value="4° Semestre">4° Semestre</ion-select-option>
+          <ion-select-option value="5° Semestre">5° Semestre</ion-select-option>
+          <ion-select-option value="6° Semestre">6° Semestre</ion-select-option>
+          <ion-select-option value="Egresado">Egresado</ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('grado_escolar')">
+        Selecciona tu grado escolar
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Información Académica</h3>
+      
+      <ion-item>
+        <ion-label position="stacked">Bachillerato de Procedencia *</ion-label>
+        <ion-select 
+          formControlName="bachillerato_procedencia" 
+          placeholder="Selecciona tu bachillerato"
+          [class.error]="isFieldInvalid('bachillerato_procedencia')">
+          <ion-select-option 
+            *ngFor="let bachillerato of bachilleratos" 
+            [value]="bachillerato">
+            {{bachillerato.nombre}} - {{bachillerato.municipio.nombre}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('bachillerato_procedencia')">
+        Selecciona tu bachillerato
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Municipio de Procedencia *</ion-label>
+        <ion-select 
+          formControlName="municipio_procedencia" 
+          placeholder="Selecciona tu municipio"
+          [class.error]="isFieldInvalid('municipio_procedencia')">
+          <ion-select-option 
+            *ngFor="let municipio of municipios" 
+            [value]="municipio">
+            {{municipio.nombre}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('municipio_procedencia')">
+        Selecciona tu municipio
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Carrera de Interés *</ion-label>
+        <ion-select 
+          formControlName="carrera_interes" 
+          placeholder="Selecciona una carrera"
+          [class.error]="isFieldInvalid('carrera_interes')">
+          <ion-select-option 
+            *ngFor="let carrera of carreras" 
+            [value]="carrera">
+            {{carrera.nombre}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('carrera_interes')">
+        Selecciona una carrera
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">Campus de Interés *</ion-label>
+        <ion-select 
+          formControlName="campus_interes" 
+          placeholder="Selecciona un campus"
+          [class.error]="isFieldInvalid('campus_interes')">
+          <ion-select-option 
+            *ngFor="let campus of campusOptions" 
+            [value]="campus">
+            {{campus.nombre}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('campus_interes')">
+        Selecciona un campus
+      </div>
+
+      <ion-item>
+        <ion-label position="stacked">¿Cómo te enteraste de UTZAC? *</ion-label>
+        <ion-select 
+          formControlName="como_se_entero" 
+          placeholder="Selecciona una opción"
+          [class.error]="isFieldInvalid('como_se_entero')">
+          <ion-select-option 
+            *ngFor="let opcion of enterasteOpciones" 
+            [value]="opcion">
+            {{opcion.nombre}}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+      <div class="error-message" *ngIf="isFieldInvalid('como_se_entero')">
+        Selecciona una opción
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Comentarios Adicionales</h3>
+      
+      <ion-item>
+        <ion-label position="stacked">Comentarios (Opcional)</ion-label>
+        <ion-textarea 
+          formControlName="comentarios" 
+          placeholder="Comparte cualquier información adicional que consideres importante..."
+          rows="4">
+        </ion-textarea>
+      </ion-item>
+    </div>
+
+    <div class="form-actions">
+      <ion-button 
+        expand="block" 
+        type="submit" 
+        [disabled]="aspiranteForm.invalid || isSubmitting"
+        class="submit-button">
+        <ion-icon name="send-outline" slot="start"></ion-icon>
+        <span *ngIf="!isSubmitting">Enviar Registro</span>
+        <span *ngIf="isSubmitting">Enviando...</span>
+      </ion-button>
+    </div>
+  </form>
+
+  <!-- Modal de confirmación -->
+  <ion-modal [isOpen]="showSuccessModal" (didDismiss)="closeSuccessModal()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="success">
+          <ion-title>¡Registro Exitoso!</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeSuccessModal()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="success-modal">
+        <div class="success-content">
+          <ion-icon name="checkmark-circle" class="success-icon"></ion-icon>
+          <h2>¡Gracias por tu interés en UTZAC!</h2>
+          <p>Tu registro ha sido enviado exitosamente. Un responsable del área se pondrá en contacto contigo pronto para brindarte más información sobre el proceso de admisión.</p>
+          <div class="contact-info">
+            <h3>Información de Contacto:</h3>
+            <p><ion-icon name="call"></ion-icon> (492) 922 8500</p>
+            <p><ion-icon name="mail"></ion-icon> admisiones@utzac.edu.mx</p>
+            <p><ion-icon name="location"></ion-icon> Carretera Río Grande - Fresnillo Km. 4.5</p>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

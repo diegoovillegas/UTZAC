@@ -1,0 +1,208 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goToDashboard()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Reportes y Estadísticas</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="reportes-container" *ngIf="estadisticas">
+    <!-- Filtros de reporte -->
+    <div class="filtros-section">
+      <h3>Filtros de Reporte</h3>
+      
+      <div class="filtros-grid">
+        <ion-item>
+          <ion-label position="stacked">Fecha Inicio</ion-label>
+          <ion-input 
+            type="date" 
+            [(ngModel)]="filtroFechaInicio"
+            (ionChange)="aplicarFiltros()">
+          </ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Fecha Fin</ion-label>
+          <ion-input 
+            type="date" 
+            [(ngModel)]="filtroFechaFin"
+            (ionChange)="aplicarFiltros()">
+          </ion-input>
+        </ion-item>
+
+        <ion-item *ngIf="currentUser?.rol === 'administrador'">
+          <ion-label position="stacked">Responsable</ion-label>
+          <ion-select 
+            [(ngModel)]="filtroResponsable"
+            (ionChange)="aplicarFiltros()"
+            placeholder="Todos">
+            <ion-select-option [value]="null">Todos</ion-select-option>
+            <ion-select-option *ngFor="let responsable of responsables" [value]="responsable.id">
+              {{responsable.nombre}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Carrera</ion-label>
+          <ion-select 
+            [(ngModel)]="filtroCarrera"
+            (ionChange)="aplicarFiltros()"
+            placeholder="Todas">
+            <ion-select-option [value]="null">Todas</ion-select-option>
+            <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.id">
+              {{carrera.nombre}}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+      <div class="export-buttons">
+        <ion-button fill="outline" (click)="exportarReporte('excel')">
+          <ion-icon name="document-outline" slot="start"></ion-icon>
+          Exportar Excel
+        </ion-button>
+        <ion-button fill="outline" (click)="exportarReporte('pdf')">
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          Exportar PDF
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Resumen ejecutivo -->
+    <div class="resumen-section">
+      <h3>Resumen Ejecutivo</h3>
+      
+      <div class="resumen-grid">
+        <div class="resumen-card">
+          <div class="resumen-icon">
+            <ion-icon name="people-outline"></ion-icon>
+          </div>
+          <div class="resumen-content">
+            <h4>{{getAspirantesPorPeriodo().length}}</h4>
+            <p>Aspirantes en Período</p>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <div class="resumen-icon success">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+          </div>
+          <div class="resumen-content">
+            <h4>{{getConversionRate()}}%</h4>
+            <p>Tasa de Conversión</p>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <div class="resumen-icon warning">
+            <ion-icon name="calendar-outline"></ion-icon>
+          </div>
+          <div class="resumen-content">
+            <h4>{{estadisticas.eventos_mes}}</h4>
+            <p>Eventos del Mes</p>
+          </div>
+        </div>
+
+        <div class="resumen-card">
+          <div class="resumen-icon info">
+            <ion-icon name="trending-up-outline"></ion-icon>
+          </div>
+          <div class="resumen-content">
+            <h4>{{estadisticas.total_aspirantes}}</h4>
+            <p>Total Histórico</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas por semáforo -->
+    <div class="estadisticas-section">
+      <h3>Distribución por Estado</h3>
+      
+      <div class="semaforo-stats">
+        <div class="semaforo-item" *ngFor="let item of estadisticas.por_semaforo | keyvalue">
+          <div class="semaforo-color" 
+               [style.background-color]="item.key === 'Rojo' ? '#ef4444' : 
+                                        item.key === 'Amarillo' ? '#eab308' : 
+                                        item.key === 'Rosa' ? '#ec4899' : 
+                                        item.key === 'Verde' ? '#22c55e' : '#6b7280'">
+          </div>
+          <div class="semaforo-info">
+            <span class="semaforo-label">{{item.key}}</span>
+            <span class="semaforo-count">{{item.value}}</span>
+          </div>
+          <div class="semaforo-percentage">
+            {{estadisticas.total_aspirantes > 0 ? ((item.value / estadisticas.total_aspirantes) * 100).toFixed(1) : 0}}%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top carreras -->
+    <div class="carreras-section">
+      <h3>Carreras Más Solicitadas</h3>
+      
+      <div class="carreras-chart">
+        <div class="carrera-item" *ngFor="let carrera of estadisticas.carreras_populares">
+          <div class="carrera-info">
+            <span class="carrera-nombre">{{carrera.carrera}}</span>
+            <span class="carrera-count">{{carrera.cantidad}} aspirantes</span>
+          </div>
+          <div class="carrera-bar">
+            <div class="carrera-fill" 
+                 [style.width.%]="estadisticas.total_aspirantes > 0 ? (carrera.cantidad / estadisticas.total_aspirantes) * 100 : 0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribución geográfica -->
+    <div class="geografia-section">
+      <h3>Distribución Geográfica</h3>
+      
+      <div class="municipios-chart">
+        <div class="municipio-item" *ngFor="let municipio of estadisticas.municipios_origen">
+          <div class="municipio-info">
+            <span class="municipio-nombre">{{municipio.municipio}}</span>
+            <span class="municipio-count">{{municipio.cantidad}} aspirantes</span>
+          </div>
+          <div class="municipio-bar">
+            <div class="municipio-fill" 
+                 [style.width.%]="estadisticas.total_aspirantes > 0 ? (municipio.cantidad / estadisticas.total_aspirantes) * 100 : 0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rendimiento por responsable (solo para administradores) -->
+    <div class="responsables-section" *ngIf="currentUser?.rol === 'administrador'">
+      <h3>Rendimiento por Responsable</h3>
+      
+      <div class="responsables-chart">
+        <div class="responsable-item" *ngFor="let responsable of estadisticas.por_responsable">
+          <div class="responsable-info">
+            <span class="responsable-nombre">{{responsable.responsable}}</span>
+            <span class="responsable-count">{{responsable.cantidad}} aspirantes</span>
+          </div>
+          <div class="responsable-bar">
+            <div class="responsable-fill" 
+                 [style.width.%]="estadisticas.total_aspirantes > 0 ? (responsable.cantidad / estadisticas.total_aspirantes) * 100 : 0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,172 @@
+.eventos-container {
+  padding: 1rem;
+  background: var(--utzac-background);
+  min-height: 100vh;
+  
+  .eventos-list {
+    .evento-card {
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      
+      .evento-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        
+        .evento-info {
+          flex: 1;
+          
+          ion-card-title {
+            color: var(--utzac-dark);
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+          }
+          
+          ion-card-subtitle {
+            color: var(--utzac-primary);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            
+            ion-icon {
+              margin-right: 0.5rem;
+            }
+          }
+        }
+        
+        ion-button {
+          --color: var(--utzac-primary);
+        }
+      }
+      
+      .evento-details {
+        .detail-section {
+          margin-bottom: 1.5rem;
+          
+          h4 {
+            color: var(--utzac-dark);
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            
+            ion-icon {
+              margin-right: 0.5rem;
+              color: var(--utzac-primary);
+            }
+          }
+          
+          p {
+            color: #6c757d;
+            line-height: 1.5;
+            margin: 0;
+          }
+          
+          .observaciones {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--utzac-primary);
+          }
+          
+          .carreras-chips,
+          .vehiculos-list,
+          .participantes-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            
+            ion-chip {
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .no-events {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+    
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.modal-content {
+  padding: 1rem;
+  
+  ion-item {
+    --border-radius: 8px;
+    --background: #f8f9fa;
+    margin-bottom: 0.5rem;
+    
+    &.item-has-focus {
+      --background: #fff;
+      --border-color: var(--utzac-primary);
+    }
+    
+    ion-label {
+      font-weight: 500;
+      color: var(--utzac-dark);
+    }
+    
+    ion-input, ion-select, ion-textarea, ion-datetime {
+      --color: var(--utzac-dark);
+      
+      &.error {
+        --border-color: #e74c3c;
+        --background: #fdf2f2;
+      }
+    }
+  }
+  
+  .error-message {
+    color: #e74c3c;
+    font-size: 0.8rem;
+    margin: 0.25rem 0 1rem 1rem;
+    font-weight: 500;
+  }
+  
+  .submit-button {
+    --background: var(--utzac-primary);
+    margin-top: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .eventos-container {
+    .evento-card {
+      .evento-header {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        ion-button {
+          align-self: flex-end;
+          margin-top: 0.5rem;
+        }
+      }
+      
+      .detail-section {
+        .carreras-chips,
+        .vehiculos-list,
+        .participantes-list {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+      }
+    }
+  }
+}

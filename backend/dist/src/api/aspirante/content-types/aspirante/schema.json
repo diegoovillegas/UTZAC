@@ -1,0 +1,87 @@
+{
+    "kind": "collectionType",
+    "collectionName": "aspirantes",
+    "info": {
+        "singularName": "aspirante",
+        "pluralName": "aspirantes",
+        "displayName": "aspirante"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "nombre": {
+            "type": "string"
+        },
+        "apellido": {
+            "type": "string"
+        },
+        "email": {
+            "type": "email"
+        },
+        "telefono": {
+            "type": "string"
+        },
+        "grado_escolar": {
+            "type": "integer"
+        },
+        "comentarios": {
+            "type": "text"
+        },
+        "semaforo": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::semaforo.semaforo",
+            "inversedBy": "aspirantes_actuales"
+        },
+        "documentos": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::documento.documento",
+            "mappedBy": "aspirante"
+        },
+        "toques": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::toque.toque",
+            "mappedBy": "aspirante"
+        },
+        "bachillerato_procedencia": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::bachillerato.bachillerato",
+            "inversedBy": "aspirante"
+        },
+        "municipio_procedencia": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::municipio.municipio",
+            "inversedBy": "aspirante"
+        },
+        "carrera_interes": {
+            "type": "relation",
+            "relation": "oneToMany",
+            "target": "api::carrera.carrera",
+            "mappedBy": "aspirante"
+        },
+        "campus_intere": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::campus.campus",
+            "inversedBy": "aspirantes"
+        },
+        "como_se_entero": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "api::enteraste.enteraste",
+            "inversedBy": "aspirante"
+        },
+        "user": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "plugin::users-permissions.user",
+            "inversedBy": "aspirantes"
+        }
+    }
+}

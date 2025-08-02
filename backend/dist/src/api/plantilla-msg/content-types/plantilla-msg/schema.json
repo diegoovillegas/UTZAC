@@ -1,0 +1,27 @@
+{
+    "kind": "collectionType",
+    "collectionName": "plantilla_msgs",
+    "info": {
+        "singularName": "plantilla-msg",
+        "pluralName": "plantilla-msgs",
+        "displayName": "plantilla_msg"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "mensaje": {
+            "type": "text"
+        },
+        "tipo": {
+            "type": "string"
+        },
+        "creado_por": {
+            "type": "relation",
+            "relation": "oneToOne",
+            "target": "plugin::users-permissions.user",
+            "mappedBy": "plantilla_msg"
+        }
+    }
+}

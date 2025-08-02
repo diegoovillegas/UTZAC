@@ -1,0 +1,202 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="goToDashboard()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Gestión de Aspirantes</ion-title>
+    <ion-buttons slot="end">
+      <ion-button *ngIf="currentUser?.rol === 'administrador'" (click)="abrirModalTransferencia()">
+        <ion-icon name="swap-horizontal-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="aspirantes-container">
+    <!-- Filtros y búsqueda -->
+    <div class="filtros-section">
+      <ion-searchbar 
+        [(ngModel)]="busqueda"
+        (ionInput)="onBusquedaChange()"
+        placeholder="Buscar por nombre, email o teléfono..."
+        show-clear-button="focus">
+      </ion-searchbar>
+      
+      <ion-segment [(ngModel)]="filtroSemaforo" (ionChange)="onFiltroChange()">
+        <ion-segment-button [value]="null">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+        <ion-segment-button *ngFor="let semaforo of semaforos" [value]="semaforo.id">
+          <ion-label>{{semaforo.color}}</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </div>
+
+    <!-- Lista de aspirantes -->
+    <div class="aspirantes-list">
+      <ion-card *ngFor="let aspirante of aspirantesFiltrados" class="aspirante-card">
+        <ion-card-header>
+          <div class="aspirante-header">
+            <div class="aspirante-info">
+              <ion-card-title>{{aspirante.nombre}} {{aspirante.apellidos}}</ion-card-title>
+              <ion-card-subtitle>{{aspirante.carrera_interes.nombre}}</ion-card-subtitle>
+            </div>
+            <div class="semaforo-indicator" [style.background-color]="aspirante.estado_semaforo.rgb">
+            </div>
+          </div>
+        </ion-card-header>
+
+        <ion-card-content>
+          <div class="aspirante-details">
+            <p><ion-icon name="mail-outline"></ion-icon> {{aspirante.email}}</p>
+            <p><ion-icon name="call-outline"></ion-icon> {{aspirante.telefono}}</p>
+            <p><ion-icon name="school-outline"></ion-icon> {{aspirante.bachillerato_procedencia.nombre}}</p>
+            <p><ion-icon name="location-outline"></ion-icon> {{aspirante.municipio_procedencia.nombre}}</p>
+            <p><ion-icon name="person-outline"></ion-icon> {{aspirante.responsable.nombre}}</p>
+          </div>
+
+          <div class="acciones">
+            <ion-button fill="outline" size="small" (click)="abrirModalToque(aspirante)">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              Agregar Toque
+            </ion-button>
+
+            <ion-select 
+              [(ngModel)]="aspirante.estado_semaforo.id"
+              (ionChange)="cambiarEstadoSemaforo(aspirante, $event.detail.value)"
+              interface="popover"
+              placeholder="Cambiar Estado">
+              <ion-select-option *ngFor="let semaforo of semaforos" [value]="semaforo.id">
+                {{semaforo.color}} - {{semaforo.estado_nota}}
+              </ion-select-option>
+            </ion-select>
+          </div>
+
+          <!-- Historial de toques -->
+          <div class="toques-historial" *ngIf="aspirante.toques.length > 0">
+            <h4>Historial de Seguimiento</h4>
+            <div class="toque-item" *ngFor="let toque of aspirante.toques">
+              <div class="toque-header">
+                <strong>{{toque.nombre}}</strong>
+                <span class="toque-fecha">{{toque.fecha | date:'dd/MM/yyyy HH:mm'}}</span>
+              </div>
+              <p class="toque-nota">{{toque.nota}}</p>
+              <small class="toque-responsable">Por: {{toque.responsable.nombre}}</small>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Mensaje cuando no hay resultados -->
+    <div class="no-results" *ngIf="aspirantesFiltrados.length === 0">
+      <ion-icon name="search-outline"></ion-icon>
+      <h3>No se encontraron aspirantes</h3>
+      <p>Intenta ajustar los filtros de búsqueda</p>
+    </div>
+  </div>
+
+  <!-- Modal para agregar toque -->
+  <ion-modal [isOpen]="showToqueModal" (didDismiss)="cerrarModalToque()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Agregar Toque de Seguimiento</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalToque()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <form #toqueForm="ngForm" (ngSubmit)="agregarToque(toqueForm.value)">
+          <div class="modal-content">
+            <ion-item>
+              <ion-label position="stacked">Tipo de Toque *</ion-label>
+              <ion-select name="nombre" ngModel required>
+                <ion-select-option value="Llamada telefónica">Llamada telefónica</ion-select-option>
+                <ion-select-option value="WhatsApp">WhatsApp</ion-select-option>
+                <ion-select-option value="Email">Email</ion-select-option>
+                <ion-select-option value="Visita presencial">Visita presencial</ion-select-option>
+                <ion-select-option value="Mensaje de texto">Mensaje de texto</ion-select-option>
+              </ion-select>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Notas del Seguimiento *</ion-label>
+              <ion-textarea 
+                name="nota" 
+                ngModel 
+                required
+                placeholder="Describe el resultado del contacto..."
+                rows="4">
+              </ion-textarea>
+            </ion-item>
+
+            <ion-button 
+              expand="block" 
+              type="submit" 
+              [disabled]="!toqueForm.valid"
+              class="submit-button">
+              <ion-icon name="save-outline" slot="start"></ion-icon>
+              Guardar Toque
+            </ion-button>
+          </div>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para transferir aspirantes -->
+  <ion-modal [isOpen]="showTransferModal" (didDismiss)="cerrarModalTransferencia()">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar color="primary">
+          <ion-title>Transferir Aspirantes</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModalTransferencia()">
+              <ion-icon name="close"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <div class="modal-content">
+          <div class="transfer-info">
+            <ion-icon name="warning-outline" color="warning"></ion-icon>
+            <h3>Transferencia de Aspirantes</h3>
+            <p>Esta acción transferirá TODOS los aspirantes y datos asociados del responsable actual a otro responsable.</p>
+          </div>
+
+          <ion-item>
+            <ion-label position="stacked">Transferir a:</ion-label>
+            <ion-select [(ngModel)]="responsableDestino" placeholder="Selecciona responsable">
+              <ion-select-option 
+                *ngFor="let responsable of responsables" 
+                [value]="responsable.id"
+                [disabled]="responsable.id === currentUser?.id">
+                {{responsable.nombre}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+
+          <ion-button 
+            expand="block" 
+            color="warning"
+            [disabled]="!responsableDestino"
+            (click)="transferirAspirantes()">
+            <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+            Confirmar Transferencia
+          </ion-button>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>

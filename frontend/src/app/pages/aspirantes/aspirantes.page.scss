@@ -1,0 +1,205 @@
+.aspirantes-container {
+  padding: 1rem;
+  background: var(--utzac-background);
+  min-height: 100vh;
+  
+  .filtros-section {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    
+    ion-searchbar {
+      --background: #f8f9fa;
+      --border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+    
+    ion-segment {
+      --background: #f8f9fa;
+      
+      ion-segment-button {
+        --color: var(--utzac-dark);
+        --color-checked: white;
+        --background-checked: var(--utzac-primary);
+      }
+    }
+  }
+  
+  .aspirantes-list {
+    .aspirante-card {
+      margin-bottom: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      
+      .aspirante-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        
+        .aspirante-info {
+          flex: 1;
+          
+          ion-card-title {
+            color: var(--utzac-dark);
+            font-size: 1.2rem;
+            font-weight: 600;
+          }
+          
+          ion-card-subtitle {
+            color: var(--utzac-primary);
+            font-weight: 500;
+          }
+        }
+        
+        .semaforo-indicator {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid white;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+      }
+      
+      .aspirante-details {
+        margin-bottom: 1rem;
+        
+        p {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.5rem;
+          color: var(--utzac-dark);
+          
+          ion-icon {
+            margin-right: 0.5rem;
+            color: var(--utzac-primary);
+          }
+        }
+      }
+      
+      .acciones {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        
+        ion-button {
+          --border-color: var(--utzac-primary);
+          --color: var(--utzac-primary);
+        }
+        
+        ion-select {
+          flex: 1;
+          min-width: 200px;
+        }
+      }
+      
+      .toques-historial {
+        border-top: 1px solid #e9ecef;
+        padding-top: 1rem;
+        
+        h4 {
+          color: var(--utzac-dark);
+          font-size: 1rem;
+          margin-bottom: 1rem;
+        }
+        
+        .toque-item {
+          background: #f8f9fa;
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 0.5rem;
+          border-left: 4px solid var(--utzac-primary);
+          
+          .toque-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            
+            strong {
+              color: var(--utzac-dark);
+            }
+            
+            .toque-fecha {
+              font-size: 0.8rem;
+              color: #6c757d;
+            }
+          }
+          
+          .toque-nota {
+            color: var(--utzac-dark);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+          }
+          
+          .toque-responsable {
+            color: #6c757d;
+            font-style: italic;
+          }
+        }
+      }
+    }
+  }
+  
+  .no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+    
+    ion-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      margin-bottom: 0.5rem;
+    }
+  }
+}
+
+.modal-content {
+  padding: 1rem;
+  
+  .transfer-info {
+    text-align: center;
+    padding: 2rem 1rem;
+    
+    ion-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      color: var(--utzac-dark);
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      color: #6c757d;
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  .submit-button {
+    --background: var(--utzac-primary);
+    margin-top: 1rem;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .aspirantes-container {
+    .aspirante-card {
+      .acciones {
+        flex-direction: column;
+        
+        ion-select {
+          min-width: auto;
+        }
+      }
+    }
+  }
+}

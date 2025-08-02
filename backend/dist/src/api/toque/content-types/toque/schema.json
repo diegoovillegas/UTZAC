@@ -1,0 +1,30 @@
+{
+    "kind": "collectionType",
+    "collectionName": "toques",
+    "info": {
+        "singularName": "toque",
+        "pluralName": "toques",
+        "displayName": "toque"
+    },
+    "options": {
+        "draftAndPublish": true
+    },
+    "pluginOptions": {},
+    "attributes": {
+        "aspirante": {
+            "type": "relation",
+            "relation": "manyToOne",
+            "target": "api::aspirante.aspirante",
+            "inversedBy": "toques"
+        },
+        "nombre": {
+            "type": "string"
+        },
+        "nota": {
+            "type": "text"
+        },
+        "fecha": {
+            "type": "datetime"
+        }
+    }
+}

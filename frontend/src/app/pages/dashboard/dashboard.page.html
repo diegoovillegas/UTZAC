@@ -1,0 +1,132 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Dashboard - UTZAC</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        Salir
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="dashboard-container" *ngIf="currentUser && estadisticas">
+    <!-- Header de bienvenida -->
+    <div class="welcome-section">
+      <h2>Bienvenido, {{currentUser.nombre}}</h2>
+      <p class="user-role">{{currentUser.rol === 'administrador' ? 'Administrador' : 'Responsable del Área'}}</p>
+    </div>
+
+    <!-- Estadísticas principales -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <ion-icon name="people-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{estadisticas.total_aspirantes}}</h3>
+          <p>Total Aspirantes</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon success">
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{estadisticas.por_semaforo['Verde'] || 0}}</h3>
+          <p>Inscritos</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon warning">
+          <ion-icon name="time-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{estadisticas.por_semaforo['Amarillo'] || 0}}</h3>
+          <p>En Proceso</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon danger">
+          <ion-icon name="close-circle-outline"></ion-icon>
+        </div>
+        <div class="stat-content">
+          <h3>{{estadisticas.por_semaforo['Rojo'] || 0}}</h3>
+          <p>Sin Respuesta</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Acciones rápidas -->
+    <div class="quick-actions">
+      <h3>Acciones Rápidas</h3>
+      <div class="actions-grid">
+        <ion-button expand="block" fill="outline" routerLink="/aspirantes">
+          <ion-icon name="people-outline" slot="start"></ion-icon>
+          Gestionar Aspirantes
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" routerLink="/eventos">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          Eventos y Ferias
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" routerLink="/reportes">
+          <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
+          Reportes y Estadísticas
+        </ion-button>
+
+        <ion-button expand="block" fill="outline" routerLink="/configuracion" *ngIf="currentUser?.rol === 'administrador'">
+          <ion-icon name="settings-outline" slot="start"></ion-icon>
+          Configuración
+        </ion-button>
+      </div>
+    </div>
+
+    <!-- Gráficos y estadísticas detalladas -->
+    <div class="detailed-stats">
+      <div class="chart-section">
+        <h3>Carreras Más Populares</h3>
+        <div class="chart-list">
+          <div class="chart-item" *ngFor="let carrera of estadisticas.carreras_populares">
+            <span class="chart-label">{{carrera.carrera}}</span>
+            <div class="chart-bar">
+              <div class="chart-fill" [style.width.%]="(carrera.cantidad / estadisticas.total_aspirantes) * 100"></div>
+            </div>
+            <span class="chart-value">{{carrera.cantidad}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-section">
+        <h3>Municipios de Origen</h3>
+        <div class="chart-list">
+          <div class="chart-item" *ngFor="let municipio of estadisticas.municipios_origen">
+            <span class="chart-label">{{municipio.municipio}}</span>
+            <div class="chart-bar">
+              <div class="chart-fill" [style.width.%]="(municipio.cantidad / estadisticas.total_aspirantes) * 100"></div>
+            </div>
+            <span class="chart-value">{{municipio.cantidad}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="additional-info">
+      <div class="info-card">
+        <h4>Tasa de Conversión</h4>
+        <p class="conversion-rate">{{estadisticas.conversion_rate}}%</p>
+      </div>
+
+      <div class="info-card">
+        <h4>Eventos Este Mes</h4>
+        <p class="events-count">{{estadisticas.eventos_mes}}</p>
+      </div>
+    </div>
+  </div>
+</ion-content>

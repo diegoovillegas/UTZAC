@@ -1,0 +1,249 @@
+.login-page {
+  --background: linear-gradient(135deg, #0B5135 0%, #ffffff 100%);
+  
+  .login-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 1rem;
+    
+    .login-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      
+      .utzac-branding {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        
+        .logo-icon {
+          font-size: 4rem;
+          color: white;
+          margin-right: 1rem;
+          filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .branding-text {
+          text-align: left;
+          
+          h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #0B5135;
+            margin: 0;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+          }
+          
+          p {
+            font-size: 1rem;
+            color: rgba(11, 81, 53, 0.8);
+            margin: 0;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+    
+    .login-form-container {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      
+      .login-form {
+        h2 {
+          text-align: center;
+          color: #2c3e50;
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+          font-weight: 600;
+        }
+        
+        .subtitle {
+          text-align: center;
+          color: #7f8c8d;
+          margin-bottom: 2rem;
+          font-size: 1rem;
+        }
+        
+        .login-item {
+          --border-radius: 12px;
+          --background: #f8f9fa;
+          margin-bottom: 0.5rem;
+          
+          &.item-has-focus {
+            --background: #fff;
+            --border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+          }
+          
+          ion-label {
+            font-weight: 500;
+            color: #2c3e50;
+          }
+          
+          ion-input {
+            --color: #2c3e50;
+            --padding-start: 3rem;
+            
+            &.error {
+              --border-color: #e74c3c;
+              --background: #fdf2f2;
+            }
+          }
+          
+          ion-icon[slot="start"] {
+            color: #0B5135;
+            margin-left: 1rem;
+            font-size: 1.2rem;
+          }
+          
+          .password-toggle {
+            --color: #7f8c8d;
+            
+            &:hover {
+              --color: #0B5135;
+            }
+          }
+        }
+        
+        .error-message {
+          color: #e74c3c;
+          font-size: 0.85rem;
+          margin: 0.25rem 0 1rem 1rem;
+          font-weight: 500;
+        }
+        
+        .login-button {
+          --background: #0B5135;
+          --color: white;
+          height: 50px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          --border-radius: 25px;
+          margin-top: 1.5rem;
+          box-shadow: 0 4px 15px rgba(11, 81, 53, 0.4);
+          
+          &:hover {
+            --background: #0a472f;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(11, 81, 53, 0.6);
+          }
+          
+          &[disabled] {
+            --background: #bdc3c7;
+            box-shadow: none;
+            transform: none;
+          }
+        }
+        
+        .demo-credentials {
+          margin-top: 2rem;
+          padding: 1.5rem;
+          background: #f8f9fa;
+          border-radius: 12px;
+          border-left: 4px solid #0B5135;
+          
+          h3 {
+            color: #2c3e50;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+          }
+          
+          .demo-user {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            
+            &:hover {
+              background: #0B5135;
+              color: white;
+              transform: translateX(5px);
+              box-shadow: 0 2px 8px rgba(11, 81, 53, 0.3);
+            }
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+            
+            strong {
+              display: block;
+              margin-bottom: 0.25rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .public-access {
+      .public-button {
+        --border-color: white;
+        --color: white;
+        height: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        --border-radius: 25px;
+        
+        &:hover {
+          --background: rgba(255, 255, 255, 0.1);
+          --border-color: rgba(255, 255, 255, 0.8);
+        }
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .login-page {
+    .login-container {
+      padding: 1rem;
+      
+      .login-header {
+        .utzac-branding {
+          flex-direction: column;
+          
+          .logo-icon {
+            margin-right: 0;
+            margin-bottom: 1rem;
+          }
+          
+          .branding-text {
+            text-align: center;
+            
+            h1 {
+              font-size: 2.5rem;
+            }
+          }
+        }
+      }
+      
+      .login-form-container {
+        padding: 1.5rem;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    .login-container {
+      .login-header {
+        .utzac-branding {
+          .branding-text h1 {
+            font-size: 2rem;
+          }
+        }
+      }
+    }
+  }
+}

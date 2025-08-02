@@ -1,0 +1,7 @@
+{
+  "name": "Utzac",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
