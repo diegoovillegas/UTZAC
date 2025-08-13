@@ -13,7 +13,7 @@
   "attributes": {
     "aspirantes_actuales": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "oneToMany",
       "target": "api::aspirante.aspirante",
       "mappedBy": "semaforo"
     },

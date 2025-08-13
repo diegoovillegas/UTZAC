@@ -14,8 +14,8 @@
   <div class="dashboard-container" *ngIf="currentUser && estadisticas">
     <!-- Header de bienvenida -->
     <div class="welcome-section">
-      <h2>Bienvenido, {{currentUser.nombre}}</h2>
-      <p class="user-role">{{currentUser.rol === 'administrador' ? 'Administrador' : 'Responsable del Área'}}</p>
+      <h2>Bienvenido, {{currentUser.username}}</h2>
+      <p class="user-role">{{currentUser.role.name === 'administrador' ? 'Administrador' : 'Responsable'}}</p>
     </div>
 
     <!-- Estadísticas principales -->
@@ -65,7 +65,7 @@
     <div class="quick-actions">
       <h3>Acciones Rápidas</h3>
       <div class="actions-grid">
-        <ion-button expand="block" fill="outline" routerLink="/aspirantes">
+        <ion-button expand="block" fill="outline" (click)="aspirantes()">
           <ion-icon name="people-outline" slot="start"></ion-icon>
           Gestionar Aspirantes
         </ion-button>
@@ -80,7 +80,8 @@
           Reportes y Estadísticas
         </ion-button>
 
-        <ion-button expand="block" fill="outline" routerLink="/configuracion" *ngIf="currentUser?.rol === 'administrador'">
+        <ion-button expand="block" fill="outline" routerLink="/configuracion"
+          *ngIf="currentUser?.rol === 'administrador'">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
           Configuración
         </ion-button>
@@ -108,7 +109,8 @@
           <div class="chart-item" *ngFor="let municipio of estadisticas.municipios_origen">
             <span class="chart-label">{{municipio.municipio}}</span>
             <div class="chart-bar">
-              <div class="chart-fill" [style.width.%]="(municipio.cantidad / estadisticas.total_aspirantes) * 100"></div>
+              <div class="chart-fill" [style.width.%]="(municipio.cantidad / estadisticas.total_aspirantes) * 100">
+              </div>
             </div>
             <span class="chart-value">{{municipio.cantidad}}</span>
           </div>

@@ -107,53 +107,48 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <form [formGroup]="eventoForm" (ngSubmit)="guardarEvento()">
+        <form (ngSubmit)="guardarEvento()" #eventoForm="ngForm">
           <div class="modal-content">
             <ion-item>
               <ion-label position="stacked">Nombre del Evento *</ion-label>
               <ion-input 
-                formControlName="nombre" 
+                [(ngModel)]="eventoData.nombre"
+                name="nombre"
                 placeholder="Ej: Feria Educativa Zacatecas 2024"
-                [class.error]="isFieldInvalid('nombre')">
+                required>
               </ion-input>
             </ion-item>
-            <div class="error-message" *ngIf="isFieldInvalid('nombre')">
-              El nombre del evento es requerido
-            </div>
 
             <ion-item>
               <ion-label position="stacked">Fecha y Hora *</ion-label>
               <ion-datetime 
-                formControlName="fecha"
+                [(ngModel)]="eventoData.fecha"
+                name="fecha"
                 display-format="DD/MM/YYYY HH:mm"
                 picker-format="DD/MM/YYYY HH:mm"
-                [class.error]="isFieldInvalid('fecha')">
+                required>
               </ion-datetime>
             </ion-item>
-            <div class="error-message" *ngIf="isFieldInvalid('fecha')">
-              La fecha es requerida
-            </div>
 
             <ion-item>
               <ion-label position="stacked">Carreras a Promocionar *</ion-label>
               <ion-select 
-                formControlName="carreras_promocionadas" 
+                [(ngModel)]="eventoData.carreras_promocionadas"
+                name="carreras_promocionadas"
                 multiple="true"
                 placeholder="Selecciona las carreras"
-                [class.error]="isFieldInvalid('carreras_promocionadas')">
+                required>
                 <ion-select-option *ngFor="let carrera of carreras" [value]="carrera.id">
                   {{carrera.nombre}}
                 </ion-select-option>
               </ion-select>
             </ion-item>
-            <div class="error-message" *ngIf="isFieldInvalid('carreras_promocionadas')">
-              Selecciona al menos una carrera
-            </div>
 
             <ion-item>
               <ion-label position="stacked">Maestro Responsable</ion-label>
               <ion-input 
-                formControlName="maestro" 
+                [(ngModel)]="eventoData.maestro"
+                name="maestro"
                 placeholder="Nombre del maestro responsable">
               </ion-input>
             </ion-item>
@@ -161,7 +156,8 @@
             <ion-item>
               <ion-label position="stacked">Vehículos Disponibles</ion-label>
               <ion-input 
-                formControlName="vehiculos_disponibles" 
+                [(ngModel)]="eventoData.vehiculos_disponibles"
+                name="vehiculos_disponibles"
                 placeholder="Separar por comas: Camioneta 1, Autobús, etc.">
               </ion-input>
             </ion-item>
@@ -169,7 +165,8 @@
             <ion-item>
               <ion-label position="stacked">Participantes</ion-label>
               <ion-input 
-                formControlName="participantes" 
+                [(ngModel)]="eventoData.participantes"
+                name="participantes"
                 placeholder="Separar por comas: Juan Pérez, María López, etc.">
               </ion-input>
             </ion-item>
@@ -177,7 +174,8 @@
             <ion-item>
               <ion-label position="stacked">Observaciones</ion-label>
               <ion-textarea 
-                formControlName="observaciones" 
+                [(ngModel)]="eventoData.observaciones"
+                name="observaciones"
                 placeholder="Notas adicionales sobre el evento..."
                 rows="3">
               </ion-textarea>
@@ -186,7 +184,7 @@
             <ion-button 
               expand="block" 
               type="submit" 
-              [disabled]="eventoForm.invalid"
+              [disabled]="!eventoForm.valid || !isFormValid()"
               class="submit-button">
               <ion-icon name="save-outline" slot="start"></ion-icon>
               {{isEditing ? 'Actualizar' : 'Crear'}} Evento

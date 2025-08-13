@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../../services/data.service';
 import { Evento, Carrera, User } from '../../models/aspirante.model';
@@ -15,47 +14,51 @@ export class EventosPage implements OnInit {
   eventos: Evento[] = [];
   carreras: Carrera[] = [];
   showEventoModal = false;
-  eventoForm: FormGroup;
   isEditing = false;
   eventoEditando: Evento | null = null;
 
+  eventoData = {
+    nombre: '',
+    fecha: '',
+    carreras_promocionadas: [] as number[],
+    maestro: '',
+    vehiculos_disponibles: '',
+    observaciones: '',
+    participantes: ''
+  };
+
   constructor(
     private dataService: DataService,
-    private router: Router,
-    private formBuilder: FormBuilder
-  ) {
-    this.eventoForm = this.formBuilder.group({
-      nombre: ['', [Validators.required, Validators.minLength(3)]],
-      fecha: ['', Validators.required],
-      carreras_promocionadas: [[], Validators.required],
-      maestro: [''],
-      vehiculos_disponibles: [''],
-      observaciones: [''],
-      participantes: ['']
-    });
-  }
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    this.currentUser = this.dataService.getCurrentUser();
+    this.loadCurrentUser();
+  }
+
+  async loadCurrentUser() {
+    this.currentUser = await this.dataService.getCurrentUser();
     if (!this.currentUser) {
       this.router.navigate(['/login']);
       return;
     }
     
-    this.loadData();
+    await this.loadData();
   }
 
-  loadData() {
-    this.carreras = this.dataService.getCarreras();
-    this.dataService.getEventos().subscribe(eventos => {
-      this.eventos = eventos.sort((a, b) => b.fecha.getTime() - a.fecha.getTime());
+  async loadData() {
+    this.carreras = await this.dataService.getCarreras();
+    (await this.dataService.getEventos()).subscribe(eventos => {
+      this.eventos = (eventos as any[]).sort((a, b) => 
+  new Date(b.fecha).getTime() - new Date(a.fecha).getTime()
+);
     });
   }
 
   abrirModalEvento() {
     this.isEditing = false;
     this.eventoEditando = null;
-    this.eventoForm.reset();
+    this.resetForm();
     this.showEventoModal = true;
   }
 
@@ -63,7 +66,7 @@ export class EventosPage implements OnInit {
     this.isEditing = true;
     this.eventoEditando = evento;
     
-    this.eventoForm.patchValue({
+    this.eventoData = {
       nombre: evento.nombre,
       fecha: evento.fecha.toISOString(),
       carreras_promocionadas: evento.carreras_promocionadas.map(c => c.id),
@@ -71,7 +74,7 @@ export class EventosPage implements OnInit {
       vehiculos_disponibles: evento.vehiculos_disponibles.join(', '),
       observaciones: evento.observaciones,
       participantes: evento.participantes.join(', ')
-    });
+    };
     
     this.showEventoModal = true;
   }
@@ -80,32 +83,31 @@ export class EventosPage implements OnInit {
     this.showEventoModal = false;
     this.isEditing = false;
     this.eventoEditando = null;
-    this.eventoForm.reset();
+    this.resetForm();
   }
 
-  guardarEvento() {
-    if (this.eventoForm.valid) {
-      const formData = this.eventoForm.value;
+  async guardarEvento() {
+    if (this.isFormValid()) {
       
       const carrerasSeleccionadas = this.carreras.filter(c => 
-        formData.carreras_promocionadas.includes(c.id)
+        this.eventoData.carreras_promocionadas.includes(c.id)
       );
       
-      const vehiculos = formData.vehiculos_disponibles 
-        ? formData.vehiculos_disponibles.split(',').map((v: string) => v.trim()).filter((v: string) => v)
+      const vehiculos = this.eventoData.vehiculos_disponibles 
+        ? this.eventoData.vehiculos_disponibles.split(',').map((v: string) => v.trim()).filter((v: string) => v)
         : [];
       
-      const participantes = formData.participantes 
-        ? formData.participantes.split(',').map((p: string) => p.trim()).filter((p: string) => p)
+      const participantes = this.eventoData.participantes 
+        ? this.eventoData.participantes.split(',').map((p: string) => p.trim()).filter((p: string) => p)
         : [];
 
       const eventoData = {
-        nombre: formData.nombre,
-        fecha: new Date(formData.fecha),
+        nombre: this.eventoData.nombre,
+        fecha: new Date(this.eventoData.fecha),
         carreras_promocionadas: carrerasSeleccionadas,
-        maestro: formData.maestro || undefined,
+        maestro: this.eventoData.maestro || undefined,
         vehiculos_disponibles: vehiculos,
-        observaciones: formData.observaciones,
+        observaciones: this.eventoData.observaciones,
         participantes: participantes
       };
 
@@ -114,20 +116,35 @@ export class EventosPage implements OnInit {
         Object.assign(this.eventoEditando, eventoData);
       } else {
         // Crear nuevo evento
-        this.dataService.crearEvento(eventoData);
+        await this.dataService.crearEvento(eventoData);
       }
       
       this.cerrarModalEvento();
     }
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.eventoForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
+  isFormValid(): boolean {
+    return !!(
+      this.eventoData.nombre &&
+      this.eventoData.fecha &&
+      this.eventoData.carreras_promocionadas.length > 0
+    );
   }
 
-  logout() {
-    this.dataService.logout();
+  resetForm() {
+    this.eventoData = {
+      nombre: '',
+      fecha: '',
+      carreras_promocionadas: [],
+      maestro: '',
+      vehiculos_disponibles: '',
+      observaciones: '',
+      participantes: ''
+    };
+  }
+
+  async logout() {
+    await this.dataService.logout();
     this.router.navigate(['/login']);
   }
 

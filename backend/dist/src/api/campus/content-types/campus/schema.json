@@ -15,7 +15,7 @@
             "type": "relation",
             "relation": "oneToMany",
             "target": "api::aspirante.aspirante",
-            "mappedBy": "campus_intere"
+            "mappedBy": "campus_interes"
         },
         "nombre": {
             "type": "string"

@@ -11,7 +11,7 @@
     </div>
 
     <div class="login-form-container">
-      <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="login-form">
+      <form (ngSubmit)="onLogin()" class="login-form">
         <h2>Iniciar Sesión</h2>
         <p class="subtitle">Accede al sistema de gestión</p>
 
@@ -19,24 +19,22 @@
           <ion-label position="stacked">Correo Electrónico</ion-label>
           <ion-input 
             type="email"
-            formControlName="email" 
+            name="identifier"
+            [(ngModel)]="loginForm.identifier"
             placeholder="usuario@utzac.edu.mx"
-            [class.error]="isFieldInvalid('email')">
+            required>
             <ion-icon name="mail-outline" slot="start"></ion-icon>
           </ion-input>
         </ion-item>
-        <div class="error-message" *ngIf="isFieldInvalid('email')">
-          <span *ngIf="loginForm.get('email')?.errors?.['required']">El correo es requerido</span>
-          <span *ngIf="loginForm.get('email')?.errors?.['email']">Ingresa un correo válido</span>
-        </div>
 
         <ion-item class="login-item">
           <ion-label position="stacked">Contraseña</ion-label>
           <ion-input 
             [type]="showPassword ? 'text' : 'password'"
-            formControlName="password" 
+            name="password"
+            [(ngModel)]="loginForm.password"
             placeholder="Ingresa tu contraseña"
-            [class.error]="isFieldInvalid('password')">
+            required>
             <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
             <ion-button 
               fill="clear" 
@@ -47,9 +45,6 @@
             </ion-button>
           </ion-input>
         </ion-item>
-        <div class="error-message" *ngIf="isFieldInvalid('password')">
-          La contraseña es requerida
-        </div>
 
         <div class="error-message" *ngIf="loginError">
           {{loginError}}
@@ -58,8 +53,8 @@
         <ion-button 
           expand="block" 
           type="submit" 
-          [disabled]="loginForm.invalid || isLoggingIn"
-          class="login-button">
+          class="login-button"
+          [disabled]="isLoggingIn">
           <ion-icon name="log-in-outline" slot="start"></ion-icon>
           <span *ngIf="!isLoggingIn">Iniciar Sesión</span>
           <span *ngIf="isLoggingIn">Iniciando...</span>
@@ -67,11 +62,8 @@
 
         <div class="demo-credentials">
           <h3>Credenciales de Demostración:</h3>
-          <div class="demo-user" (click)="fillDemoCredentials('admin')">
-            <strong>Administrador:</strong> maria@utzac.edu.mx / 123456
-          </div>
-          <div class="demo-user" (click)="fillDemoCredentials('responsable')">
-            <strong>Responsable:</strong> juan@utzac.edu.mx / 123456
+          <div class="demo-user" *ngFor="let usuario of usuariosDemo" (click)="usarCredencialesDemo(usuario)">
+            <strong>Usuario:</strong> {{ usuario.identifier }} / {{ usuario.password }}
           </div>
         </div>
       </form>

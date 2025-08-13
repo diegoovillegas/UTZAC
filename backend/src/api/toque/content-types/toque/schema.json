@@ -11,9 +11,9 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "aspirante": {
+    "aspirantes": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "manyToMany",
       "target": "api::aspirante.aspirante",
       "inversedBy": "toques"
     },

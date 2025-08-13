@@ -11,12 +11,6 @@
     },
     "pluginOptions": {},
     "attributes": {
-        "aspirante": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "api::aspirante.aspirante",
-            "mappedBy": "municipio_procedencia"
-        },
         "nombre": {
             "type": "string"
         }

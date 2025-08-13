@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../../services/data.service';
 import { User, PlantillaMensaje } from '../../models/aspirante.model';
@@ -14,20 +13,20 @@ export class ConfiguracionPage implements OnInit {
   currentUser: User | null = null;
   plantillas: PlantillaMensaje[] = [];
   showPlantillaModal = false;
-  plantillaForm: FormGroup;
   isEditing = false;
   plantillaEditando: PlantillaMensaje | null = null;
-  currentDate = new Date();
+  
+  plantillaData = {
+    mensaje: '',
+    tipo: ''
+  };
+
+  lastSessionDate = new Date().toLocaleString('es-MX');
 
   constructor(
     private dataService: DataService,
-    private router: Router,
-    private formBuilder: FormBuilder
+    private router: Router
   ) {
-    this.plantillaForm = this.formBuilder.group({
-      mensaje: ['', [Validators.required, Validators.minLength(10)]],
-      tipo: ['', Validators.required]
-    });
   }
 
   ngOnInit() {
@@ -53,7 +52,7 @@ export class ConfiguracionPage implements OnInit {
   abrirModalPlantilla() {
     this.isEditing = false;
     this.plantillaEditando = null;
-    this.plantillaForm.reset();
+    this.plantillaData = { mensaje: '', tipo: '' };
     this.showPlantillaModal = true;
   }
 
@@ -61,10 +60,10 @@ export class ConfiguracionPage implements OnInit {
     this.isEditing = true;
     this.plantillaEditando = plantilla;
     
-    this.plantillaForm.patchValue({
+    this.plantillaData = {
       mensaje: plantilla.mensaje,
       tipo: plantilla.tipo
-    });
+    };
     
     this.showPlantillaModal = true;
   }
@@ -73,23 +72,22 @@ export class ConfiguracionPage implements OnInit {
     this.showPlantillaModal = false;
     this.isEditing = false;
     this.plantillaEditando = null;
-    this.plantillaForm.reset();
+    this.plantillaData = { mensaje: '', tipo: '' };
   }
 
   guardarPlantilla() {
-    if (this.plantillaForm.valid && this.currentUser) {
-      const formData = this.plantillaForm.value;
+    if (this.isPlantillaFormValid() && this.currentUser) {
       
       if (this.isEditing && this.plantillaEditando) {
         // Actualizar plantilla existente (simulado)
-        this.plantillaEditando.mensaje = formData.mensaje;
-        this.plantillaEditando.tipo = formData.tipo;
+        this.plantillaEditando.mensaje = this.plantillaData.mensaje;
+        this.plantillaEditando.tipo = this.plantillaData.tipo;
       } else {
         // Crear nueva plantilla
         const nuevaPlantilla: PlantillaMensaje = {
           id: Date.now(),
-          mensaje: formData.mensaje,
-          tipo: formData.tipo,
+          mensaje: this.plantillaData.mensaje,
+          tipo: this.plantillaData.tipo,
           creado_por: this.currentUser
         };
         this.plantillas.push(nuevaPlantilla);
@@ -106,9 +104,8 @@ export class ConfiguracionPage implements OnInit {
     }
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.plantillaForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
+  isPlantillaFormValid(): boolean {
+    return !!(this.plantillaData.mensaje && this.plantillaData.mensaje.length >= 10 && this.plantillaData.tipo);
   }
 
   limpiarDatos() {

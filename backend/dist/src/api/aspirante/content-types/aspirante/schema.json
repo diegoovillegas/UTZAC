@@ -14,24 +14,15 @@
         "nombre": {
             "type": "string"
         },
-        "apellido": {
-            "type": "string"
-        },
         "email": {
             "type": "email"
-        },
-        "telefono": {
-            "type": "string"
-        },
-        "grado_escolar": {
-            "type": "integer"
         },
         "comentarios": {
             "type": "text"
         },
         "semaforo": {
             "type": "relation",
-            "relation": "oneToOne",
+            "relation": "manyToOne",
             "target": "api::semaforo.semaforo",
             "inversedBy": "aspirantes_actuales"
         },
@@ -43,21 +34,9 @@
         },
         "toques": {
             "type": "relation",
-            "relation": "oneToMany",
+            "relation": "manyToMany",
             "target": "api::toque.toque",
-            "mappedBy": "aspirante"
-        },
-        "bachillerato_procedencia": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "api::bachillerato.bachillerato",
-            "inversedBy": "aspirante"
-        },
-        "municipio_procedencia": {
-            "type": "relation",
-            "relation": "oneToOne",
-            "target": "api::municipio.municipio",
-            "inversedBy": "aspirante"
+            "mappedBy": "aspirantes"
         },
         "carrera_interes": {
             "type": "relation",
@@ -65,7 +44,7 @@
             "target": "api::carrera.carrera",
             "mappedBy": "aspirante"
         },
-        "campus_intere": {
+        "campus_interes": {
             "type": "relation",
             "relation": "manyToOne",
             "target": "api::campus.campus",
@@ -82,6 +61,21 @@
             "relation": "manyToOne",
             "target": "plugin::users-permissions.user",
             "inversedBy": "aspirantes"
+        },
+        "medio_contacto": {
+            "type": "text"
+        },
+        "bachillerato_procedencia": {
+            "type": "text"
+        },
+        "municipio_procedencia": {
+            "type": "text"
+        },
+        "grado_escolar": {
+            "type": "string"
+        },
+        "telefono": {
+            "type": "integer"
         }
     }
 }

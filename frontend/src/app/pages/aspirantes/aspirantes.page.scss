@@ -29,9 +29,10 @@
   
   .aspirantes-list {
     .aspirante-card {
+      --background: white;
       margin-bottom: 1rem;
       border-radius: 12px;
-      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 15px rgba(0, 0, 0, 0.178);
       
       .aspirante-header {
         display: flex;

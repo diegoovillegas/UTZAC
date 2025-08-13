@@ -384,12 +384,11 @@ export interface ApiAspiranteAspirante extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    apellido: Schema.Attribute.String;
-    bachillerato_procedencia: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::bachillerato.bachillerato'
+    bachillerato_procedencia: Schema.Attribute.Text;
+    campus_interes: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::campus.campus'
     >;
-    campus_intere: Schema.Attribute.Relation<'manyToOne', 'api::campus.campus'>;
     carrera_interes: Schema.Attribute.Relation<
       'oneToMany',
       'api::carrera.carrera'
@@ -407,22 +406,20 @@ export interface ApiAspiranteAspirante extends Struct.CollectionTypeSchema {
       'api::documento.documento'
     >;
     email: Schema.Attribute.Email;
-    grado_escolar: Schema.Attribute.Integer;
+    grado_escolar: Schema.Attribute.String;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::aspirante.aspirante'
     > &
       Schema.Attribute.Private;
-    municipio_procedencia: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::municipio.municipio'
-    >;
+    medio_contacto: Schema.Attribute.Text;
+    municipio_procedencia: Schema.Attribute.Text;
     nombre: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
-    semaforo: Schema.Attribute.Relation<'oneToOne', 'api::semaforo.semaforo'>;
-    telefono: Schema.Attribute.String;
-    toques: Schema.Attribute.Relation<'oneToMany', 'api::toque.toque'>;
+    semaforo: Schema.Attribute.Relation<'manyToOne', 'api::semaforo.semaforo'>;
+    telefono: Schema.Attribute.Integer;
+    toques: Schema.Attribute.Relation<'manyToMany', 'api::toque.toque'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -445,10 +442,6 @@ export interface ApiBachilleratoBachillerato
     draftAndPublish: true;
   };
   attributes: {
-    aspirante: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::aspirante.aspirante'
-    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -606,10 +599,6 @@ export interface ApiMunicipioMunicipio extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    aspirante: Schema.Attribute.Relation<
-      'oneToOne',
-      'api::aspirante.aspirante'
-    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -673,7 +662,7 @@ export interface ApiSemaforoSemaforo extends Struct.CollectionTypeSchema {
   };
   attributes: {
     aspirantes_actuales: Schema.Attribute.Relation<
-      'oneToOne',
+      'oneToMany',
       'api::aspirante.aspirante'
     >;
     color: Schema.Attribute.String;
@@ -707,8 +696,8 @@ export interface ApiToqueToque extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    aspirante: Schema.Attribute.Relation<
-      'manyToOne',
+    aspirantes: Schema.Attribute.Relation<
+      'manyToMany',
       'api::aspirante.aspirante'
     >;
     createdAt: Schema.Attribute.DateTime;

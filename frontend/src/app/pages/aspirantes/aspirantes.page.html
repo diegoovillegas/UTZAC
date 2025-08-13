@@ -21,12 +21,9 @@
   <div class="aspirantes-container">
     <!-- Filtros y búsqueda -->
     <div class="filtros-section">
-      <ion-searchbar 
-        [(ngModel)]="busqueda"
-        (ionInput)="onBusquedaChange()"
-        placeholder="Buscar por nombre, email o teléfono..."
-        show-clear-button="focus">
-      </ion-searchbar>
+
+      <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterAspirantes()" placeholder="Buscar por nombre, email o teléfono..." class="custom-searchbar" show-clear-button="focus">
+        </ion-searchbar>
       
       <ion-segment [(ngModel)]="filtroSemaforo" (ionChange)="onFiltroChange()">
         <ion-segment-button [value]="null">
@@ -40,25 +37,25 @@
 
     <!-- Lista de aspirantes -->
     <div class="aspirantes-list">
-      <ion-card *ngFor="let aspirante of aspirantesFiltrados" class="aspirante-card">
+      <ion-card *ngFor="let aspirante of filterAspirantes()" class="aspirante-card">
         <ion-card-header>
           <div class="aspirante-header">
             <div class="aspirante-info">
-              <ion-card-title>{{aspirante.nombre}} {{aspirante.apellidos}}</ion-card-title>
-              <ion-card-subtitle>{{aspirante.carrera_interes.nombre}}</ion-card-subtitle>
+              <ion-card-title>{{aspirante.nombre || 'no hay municipio'}}</ion-card-title>
+              <ion-card-subtitle>{{aspirante.carrera_interes?.nombre || 'no hay carrera'}}</ion-card-subtitle>
             </div>
-            <div class="semaforo-indicator" [style.background-color]="aspirante.estado_semaforo.rgb">
-            </div>
+            <!-- <div class="semaforo-indicator" [style.background-color]="aspirante.estado_semaforo.rgb">
+            </div> -->
           </div>
         </ion-card-header>
 
         <ion-card-content>
           <div class="aspirante-details">
             <p><ion-icon name="mail-outline"></ion-icon> {{aspirante.email}}</p>
-            <p><ion-icon name="call-outline"></ion-icon> {{aspirante.telefono}}</p>
-            <p><ion-icon name="school-outline"></ion-icon> {{aspirante.bachillerato_procedencia.nombre}}</p>
-            <p><ion-icon name="location-outline"></ion-icon> {{aspirante.municipio_procedencia.nombre}}</p>
-            <p><ion-icon name="person-outline"></ion-icon> {{aspirante.responsable.nombre}}</p>
+            <p><ion-icon name="call-outline"></ion-icon> {{aspirante.telefono || 'no hay municipio'}}</p>
+            <p><ion-icon name="school-outline"></ion-icon> {{aspirante.bachillerato_procedencia || 'no hay municipio'}}</p>
+            <p><ion-icon name="location-outline"></ion-icon> {{aspirante.municipio_procedencia?.nombre || 'no hay municipio'}}</p>
+            <p><ion-icon name="person-outline"></ion-icon> {{aspirante.user?.username || 'no hay responsable'}}</p>
           </div>
 
           <div class="acciones">
@@ -67,19 +64,19 @@
               Agregar Toque
             </ion-button>
 
-            <ion-select 
-              [(ngModel)]="aspirante.estado_semaforo.id"
+            <!-- <ion-select 
+              [(ngModel)]="aspirante.semaforo.documentId"
               (ionChange)="cambiarEstadoSemaforo(aspirante, $event.detail.value)"
               interface="popover"
               placeholder="Cambiar Estado">
               <ion-select-option *ngFor="let semaforo of semaforos" [value]="semaforo.id">
-                {{semaforo.color}} - {{semaforo.estado_nota}}
+                {{semaforo.color || 'no definido'}} - {{semaforo.estado_nota || 'no definido'}}
               </ion-select-option>
-            </ion-select>
+            </ion-select> -->
           </div>
 
           <!-- Historial de toques -->
-          <div class="toques-historial" *ngIf="aspirante.toques.length > 0">
+          <div class="toques-historial" *ngIf="aspirante.toques?.length > 0">
             <h4>Historial de Seguimiento</h4>
             <div class="toque-item" *ngFor="let toque of aspirante.toques">
               <div class="toque-header">
@@ -116,11 +113,11 @@
         </ion-toolbar>
       </ion-header>
       <ion-content>
-        <form #toqueForm="ngForm" (ngSubmit)="agregarToque(toqueForm.value)">
+        <form (ngSubmit)="agregarToque()">
           <div class="modal-content">
             <ion-item>
               <ion-label position="stacked">Tipo de Toque *</ion-label>
-              <ion-select name="nombre" ngModel required>
+              <ion-select [(ngModel)]="toqueData.nombre" name="nombre" required>
                 <ion-select-option value="Llamada telefónica">Llamada telefónica</ion-select-option>
                 <ion-select-option value="WhatsApp">WhatsApp</ion-select-option>
                 <ion-select-option value="Email">Email</ion-select-option>
@@ -132,8 +129,8 @@
             <ion-item>
               <ion-label position="stacked">Notas del Seguimiento *</ion-label>
               <ion-textarea 
-                name="nota" 
-                ngModel 
+                [(ngModel)]="toqueData.nota"
+                name="nota"
                 required
                 placeholder="Describe el resultado del contacto..."
                 rows="4">
@@ -143,7 +140,7 @@
             <ion-button 
               expand="block" 
               type="submit" 
-              [disabled]="!toqueForm.valid"
+              [disabled]="!isToqueFormValid()"
               class="submit-button">
               <ion-icon name="save-outline" slot="start"></ion-icon>
               Guardar Toque

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DataService } from '../../services/data.service';
+import { AlertController, LoadingController, ToastController } from '@ionic/angular';
+import { Storage } from '@ionic/storage-angular';
 
 @Component({
   selector: 'app-login',
@@ -10,77 +11,124 @@ import { DataService } from '../../services/data.service';
   standalone: false
 })
 export class LoginPage implements OnInit {
-  loginForm: FormGroup;
   showPassword = false;
   isLoggingIn = false;
   loginError = '';
+   isLoading = false;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private dataService: DataService,
-    private router: Router
+    private api: DataService,
+    private router: Router,
+    private alertController: AlertController,
+    private loadingController: LoadingController,
+    private toastController: ToastController,
+    private storage: Storage
   ) {
-    this.loginForm = this.formBuilder.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
-    });
+
   }
+
+  loginForm = {
+    identifier: '',
+    password: ''
+  };
 
   ngOnInit() {
 
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.loginForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
 
-  fillDemoCredentials(type: 'admin' | 'responsable') {
-    if (type === 'admin') {
-      this.loginForm.patchValue({
-        email: 'maria@utzac.edu.mx',
-        password: '123456'
-      });
-    } else {
-      this.loginForm.patchValue({
-        email: 'juan@utzac.edu.mx',
-        password: '123456'
-      });
-    }
+  usuariosDemo = [
+    { identifier: 'maria@utzac.edu.mx', password: '12345678' },
+    { identifier: 'juan@utzac.edu.mx', password: '123456' }
+  ]
+
+  async usarCredencialesDemo(usuario: any) {
+    this.loginForm.identifier = usuario.identifier;
+    this.loginForm.password = usuario.password;
+    await this.mostrarToast(`Credenciales cargadas para ${usuario.identifier}`, 'primary');
   }
 
   async onLogin() {
-    if (this.loginForm.valid) {
-      this.isLoggingIn = true;
-      this.loginError = '';
-
-      try {
-        // Simular delay de autenticación
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        const { email, password } = this.loginForm.value;
-        const success = this.dataService.login(email, password);
-
-        if (success) {
-          this.router.navigate(['/dashboard']);
-        } else {
-          this.loginError = 'Credenciales incorrectas. Verifica tu correo y contraseña.';
-        }
-      } catch (error) {
-        this.loginError = 'Error al iniciar sesión. Intenta nuevamente.';
-      } finally {
-        this.isLoggingIn = false;
-      }
-    } else {
-      // Marcar campos como touched para mostrar errores
-      Object.keys(this.loginForm.controls).forEach(key => {
-        this.loginForm.get(key)?.markAsTouched();
-      });
+    if (!this.validarFormulario()) {
+      return;
     }
+
+    const loading = await this.mostrarLoading();
+    this.isLoading = true;
+
+    try {
+      
+      const data = {
+        identifier: this.loginForm.identifier,
+        password: this.loginForm.password,
+      }
+      console.log(data)
+      const response = await this.api.login(data);
+      this.storage.set('token', response)
+      await loading.dismiss();
+      console.log(response.user.role)
+
+      await this.mostrarToast(`¡Bienvenido ${response.user.nombre}!`, 'success');
+
+      this.router.navigate(['/dashboard']);
+
+    } catch (error: any) {
+      await loading.dismiss();
+      await this.mostrarAlerta('Error de Autenticación', error.message || 'Credenciales incorrectas');
+    } finally {
+      this.isLoggingIn = false;
+    }
+  }
+
+  private validarFormulario(): boolean {
+    if (!this.loginForm.identifier.trim()) {
+      this.mostrarAlerta('Error', 'El email es requerido');
+      return false;
+    }
+
+    if (!this.loginForm.password.trim()) {
+      this.mostrarAlerta('Error', 'La contraseña es requerida');
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.loginForm.identifier)) {
+      this.mostrarAlerta('Error', 'Ingrese un email válido');
+      return false;
+    }
+
+    return true;
+  }
+
+  async mostrarAlerta(titulo: string, mensaje: string) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      message: mensaje,
+      buttons: ['Aceptar']
+    });
+    await alert.present();
+  }
+
+  async mostrarToast(mensaje: string, color: string = 'primary') {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 3000,
+      color: color,
+      position: 'top'
+    });
+    await toast.present();
+  }
+
+  async mostrarLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Iniciando sesión...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+    return loading;
   }
 
   goToPublicForm() {

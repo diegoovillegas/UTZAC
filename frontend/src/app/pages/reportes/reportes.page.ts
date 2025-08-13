@@ -12,7 +12,7 @@ import { User, EstadisticasPanel, Aspirante } from '../../models/aspirante.model
 export class ReportesPage implements OnInit {
   currentUser: User | null = null;
   estadisticas: EstadisticasPanel | null = null;
-  aspirantes: Aspirante[] = [];
+  aspirantes: any[] = [];
   
   // Filtros para reportes
   filtroFechaInicio: string = '';
@@ -35,19 +35,19 @@ export class ReportesPage implements OnInit {
       return;
     }
     
-    this.loadData();
+    // this.loadData();
     this.setDefaultDates();
   }
 
-  loadData() {
-    this.estadisticas = this.dataService.getEstadisticas();
-    this.responsables = this.dataService.getUsuarios();
-    this.carreras = this.dataService.getCarreras();
+  // async loadData() {
+  //   this.estadisticas = await this.dataService.getEstadisticas();
+  //   this.responsables = await  this.dataService.getUsuarios();
+  //   this.carreras = await this.dataService.getCarreras();
     
-    this.dataService.getAspirantes().subscribe(aspirantes => {
-      this.aspirantes = aspirantes;
-    });
-  }
+  //   await this.dataService.getAspirantes().then((res) => {
+  //     this.aspirantes = res;
+  //   });
+  // }
 
   setDefaultDates() {
     const hoy = new Date();
@@ -85,7 +85,7 @@ export class ReportesPage implements OnInit {
     const fechaFin = new Date(this.filtroFechaFin);
     
     return this.aspirantes.filter(aspirante => {
-      const fechaRegistro = new Date(aspirante.fecha_registro);
+      const fechaRegistro = new Date();
       return fechaRegistro >= fechaInicio && fechaRegistro <= fechaFin;
     });
   }

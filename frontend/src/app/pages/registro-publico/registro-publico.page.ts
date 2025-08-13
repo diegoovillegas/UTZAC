@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { DataService } from '../../services/data.service';
 import { Bachillerato, Municipio, Carrera, Campus, Enteraste } from '../../models/aspirante.model';
+import { SelectorMatcher } from '@angular/compiler';
 
 @Component({
   selector: 'app-registro-publico',
@@ -10,64 +10,52 @@ import { Bachillerato, Municipio, Carrera, Campus, Enteraste } from '../../model
   standalone: false
 })
 export class RegistroPublicoPage implements OnInit {
-  aspiranteForm: FormGroup;
+  aspiranteData = {
+    nombre: '',
+    email: '',
+    telefono: '',
+    grado_escolar: '',
+    bachillerato_procedencia: '',
+    municipio_procedencia: '',
+    carrera_interes: [],
+    campus_interes: [],
+    como_se_entero: [],
+    comentarios: '',
+    medio_contacto: '',
+  };
+
   isSubmitting = false;
   showSuccessModal = false;
 
-  bachilleratos: Bachillerato[] = [];
-  municipios: Municipio[] = [];
-  carreras: Carrera[] = [];
-  campusOptions: Campus[] = [];
-  enterasteOpciones: Enteraste[] = [];
+  carreras: any[] = [];
+  campusOptions: any[] = [];
+  enterasteOpciones: any[] = [];
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private dataService: DataService
-  ) {
-    this.aspiranteForm = this.formBuilder.group({
-      nombre: ['', [Validators.required, Validators.minLength(2)]],
-      apellidos: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
-      telefono: ['', [Validators.required, Validators.minLength(10)]],
-      grado_escolar: ['', Validators.required],
-      bachillerato_procedencia: ['', Validators.required],
-      municipio_procedencia: ['', Validators.required],
-      carrera_interes: ['', Validators.required],
-      campus_interes: ['', Validators.required],
-      como_se_entero: ['', Validators.required],
-      comentarios: ['']
-    });
+  constructor(private api: DataService) {}
+
+  async ngOnInit() {
+    await this.loadMasterData();
   }
 
-  ngOnInit() {
-    this.loadMasterData();
-  }
-
-  loadMasterData() {
-    this.bachilleratos = this.dataService.getBachilleratos();
-    this.municipios = this.dataService.getMunicipios();
-    this.carreras = this.dataService.getCarreras();
-    this.campusOptions = this.dataService.getCampus();
-    this.enterasteOpciones = this.dataService.getEnteraste();
-  }
-
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.aspiranteForm.get(fieldName);
-    return !!(field && field.invalid && (field.dirty || field.touched));
+  async loadMasterData() {
+    try {
+      this.carreras = await this.api.getCarreras();
+      this.campusOptions = await this.api.getCampus();
+      this.enterasteOpciones = await this.api.getEnteraste();
+    } catch (error) {
+      console.error('Error cargando datos maestros:', error);
+    }
   }
 
   async onSubmit() {
-    if (this.aspiranteForm.valid) {
+    if (this.isFormValid()) {
       this.isSubmitting = true;
       
       try {
-        // Simular delay de envío
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        this.dataService.registrarAspirante(this.aspiranteForm.value);
+        await this.api.registrarAspirante(this.aspiranteData);
         
         this.showSuccessModal = true;
-        this.aspiranteForm.reset();
+        this.resetForm();
         
       } catch (error) {
         console.error('Error al registrar aspirante:', error);
@@ -75,12 +63,37 @@ export class RegistroPublicoPage implements OnInit {
       } finally {
         this.isSubmitting = false;
       }
-    } else {
-      // Marcar todos los campos como touched para mostrar errores
-      Object.keys(this.aspiranteForm.controls).forEach(key => {
-        this.aspiranteForm.get(key)?.markAsTouched();
-      });
     }
+  }
+
+  isFormValid(): boolean {
+    return !!(
+      this.aspiranteData.nombre &&
+      this.aspiranteData.email &&
+      this.aspiranteData.telefono &&
+      this.aspiranteData.grado_escolar &&
+      this.aspiranteData.bachillerato_procedencia &&
+      this.aspiranteData.municipio_procedencia &&
+      this.aspiranteData.carrera_interes &&
+      this.aspiranteData.campus_interes &&
+      this.aspiranteData.como_se_entero
+    );
+  }
+
+  resetForm() {
+    this.aspiranteData = {
+      nombre: '',
+      email: '',
+      telefono: '',
+      grado_escolar: '',
+      bachillerato_procedencia: '',
+      municipio_procedencia: '',
+      carrera_interes: [],
+      campus_interes: [],
+      como_se_entero: [],
+      comentarios: '',
+      medio_contacto: ''
+    };
   }
 
   closeSuccessModal() {
